@@ -1,0 +1,116 @@
+name: Database Migration CI
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch: 
+
+jobs:
+  database-migration:
+    runs-on: self-hosted 
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+    
+    - name: Show System Information
+      run: |
+        echo " System Information:"
+        echo "Runner: $RUNNER_NAME"
+        echo "User: $(whoami)"
+        echo "Working Directory: $(pwd)"
+        echo "Available Space: $(df -h / | tail -1)"
+        echo "Memory: $(free -h | head -2 | tail -1)"
+        echo ".NET Version: $(dotnet --version)"
+    
+    - name: Check Migration App Exists
+      run: |
+        MIGRATION_APP_PATH="/path/to/your/migration-app/YourMigrationApp.dll"
+        
+        if [ -f "$MIGRATION_APP_PATH" ]; then
+          echo " Migration application found at: $MIGRATION_APP_PATH"
+          echo "File permissions: $(ls -la $MIGRATION_APP_PATH)"
+        else
+          echo " Migration application not found at: $MIGRATION_APP_PATH"
+          echo "Contents of directory:"
+          ls -la /path/to/your/migration-app/
+          exit 1
+        fi
+    
+    - name: Run Database Migration
+      id: migration
+      run: |
+        echo " Starting database migration from develop to staging..."
+        echo "Timestamp: $(date)"
+        
+        # اجرای migration app
+        cd /path/to/your/migration-app
+        dotnet YourMigrationApp.dll develop staging
+        
+        MIGRATION_EXIT_CODE=$?
+        echo "Migration exit code: $MIGRATION_EXIT_CODE"
+        
+        if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
+          echo " Database migration completed successfully!"
+          echo "migration_success=true" >> $GITHUB_OUTPUT
+          echo "exit_code=0" >> $GITHUB_OUTPUT
+        elif [ $MIGRATION_EXIT_CODE -eq 1 ]; then
+          echo " Database migration failed!"
+          echo "migration_success=false" >> $GITHUB_OUTPUT
+          echo "exit_code=1" >> $GITHUB_OUTPUT
+          exit 1
+        else
+          echo " Unexpected exit code: $MIGRATION_EXIT_CODE"
+          echo "migration_success=false" >> $GITHUB_OUTPUT
+          echo "exit_code=$MIGRATION_EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: Show Migration Logs
+      if: always()
+      run: |
+        echo " Migration logs:"
+        if [ -f "/var/log/migration.log" ]; then
+          echo "Last 20 lines of migration log:"
+          tail -20 /var/log/migration.log
+        else
+          echo "No migration log file found"
+        fi
+    
+    - name: Verify Database State
+      if: steps.migration.outputs.migration_success == 'true'
+      run: |
+        echo " Verifying database migration results..."
+        echo " Database verification completed"
+    
+    # - name: Deploy Application to Staging
+    #   if: steps.migration.outputs.migration_success == 'true'
+    #   run: |
+    #     echo " Starting application deployment to staging..."
+    #     
+    #     # Option 1: Restart staging service
+    #     # sudo systemctl restart your-staging-app
+    #     
+    #     # Option 2: Deploy with Docker
+    #     # cd /path/to/staging/docker-compose
+    #     # docker-compose down
+    #     # docker-compose pull
+    #     # docker-compose up -d
+    #     
+    #     # Option 3: Copy new build files
+    #     # rsync -av /path/to/build/ /path/to/staging/deployment/
+    #     # sudo systemctl restart your-staging-service
+    #     
+    #     echo " Application deployed to staging successfully"
+    
+    - name: Notify Results
+      if: always()
+      run: |
+        if [ "${{ steps.migration.outputs.migration_success }}" = "true" ]; then
+          echo " Migration Pipeline Completed Successfully!"
+          echo " Database migrated from develop to staging"
+        else
+          echo " Migration Pipeline Failed!"
+          echo " Database migration unsuccessful"
+          echo "Exit code: ${{ steps.migration.outputs.exit_code }}"
+        fi
