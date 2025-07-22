@@ -55,7 +55,7 @@ namespace DatabaseBackupService.Services
             diff.AppendLine($"--- {file1}");
             diff.AppendLine($"+++ {file2}");
 
-            // Simple line-by-line comparison (در عمل از الگوریتم‌های پیشرفته‌تر استفاده کنید)
+           
             var maxLines = Math.Max(lines1.Length, lines2.Length);
             
             for (int i = 0; i < maxLines; i++)
