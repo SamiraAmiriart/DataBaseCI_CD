@@ -23,7 +23,7 @@ namespace DatabaseBackupService.Services
             {
                 _logger.LogInformation("Starting database backup to {OutputPath}", outputPath);
 
-                // ایجاد دایرکتوری backup در صورت عدم وجود
+             
                 var directory = Path.GetDirectoryName(outputPath);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
