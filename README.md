@@ -138,5 +138,3 @@ For issues or suggestions, open a GitHub issue.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-This README is designed to be visually appealing (with badges and TOC) and informative for potential contributors or users. Replace placeholders like `yourusername/dbmigrationconsolapp` with your actual repo details. If you need a Persian version, more sections (e.g., screenshots), or adjustments based on updates to your project, just let me know! 
