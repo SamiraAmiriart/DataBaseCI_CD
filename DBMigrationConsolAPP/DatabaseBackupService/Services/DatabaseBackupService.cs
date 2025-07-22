@@ -30,11 +30,11 @@ namespace DatabaseBackupService.Services
                     Directory.CreateDirectory(directory);
                 }
 
-                // استخراج server name از connection string
+          
                 var serverName = ExtractServerFromConnectionString(connectionString);
                 var databaseName = ExtractDatabaseFromConnectionString(connectionString);
 
-                // ساخت script برای backup schema و data
+               
                 var backupScript = GenerateBackupScript(databaseName);
                 var tempScriptFile = Path.GetTempFileName();
                 
@@ -62,7 +62,7 @@ namespace DatabaseBackupService.Services
                 
                 await process.WaitForExitAsync();
 
-                // حذف فایل موقت
+               
                 if (File.Exists(tempScriptFile))
                 {
                     File.Delete(tempScriptFile);
@@ -147,7 +147,7 @@ namespace DatabaseBackupService.Services
             {
                 _logger.LogInformation("Running post-migration tests");
 
-                // نمونه تست: بررسی وجود جداول اصلی
+           
                 var testScript = @"
                     SELECT COUNT(*) as TableCount FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
                     SELECT COUNT(*) as ViewCount FROM INFORMATION_SCHEMA.VIEWS;
@@ -179,7 +179,7 @@ namespace DatabaseBackupService.Services
                 
                 await process.WaitForExitAsync();
 
-                // حذف فایل موقت
+               
                 if (File.Exists(tempScriptFile))
                 {
                     File.Delete(tempScriptFile);
@@ -209,8 +209,6 @@ namespace DatabaseBackupService.Services
             {
                 _logger.LogInformation("Starting rollback process");
 
-                // این بخش باید براساس نیاز شما پیاده‌سازی شود
-                // مثلاً restore از backup یا اجرای rollback scripts
 
                 var rollbackScript = @"
                     -- نمونه rollback script
@@ -240,7 +238,7 @@ namespace DatabaseBackupService.Services
                 process.Start();
                 await process.WaitForExitAsync();
 
-                // حذف فایل موقت
+                
                 if (File.Exists(tempScriptFile))
                 {
                     File.Delete(tempScriptFile);
