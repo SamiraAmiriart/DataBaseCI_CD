@@ -23,7 +23,7 @@ namespace DatabaseBackupService
 
                 logger.LogInformation("Database Backup Service Starting...");
 
-                // دریافت connection strings از appsettings
+                
                 var prodConnectionString = configuration.GetConnectionString("Production");
                 var devConnectionString = configuration.GetConnectionString("Development");
                 var stageConnectionString = configuration.GetConnectionString("Staging");
@@ -34,18 +34,18 @@ namespace DatabaseBackupService
                     return;
                 }
 
-                // تعریف مسیرهای فایل
+                
                 var prodBackupFile = Path.Combine(backupSettings.BackupDirectory, backupSettings.ProdBackupFile);
                 var devBackupFile = Path.Combine(backupSettings.BackupDirectory, backupSettings.DevBackupFile);
                 var diffScriptFile = Path.Combine(backupSettings.BackupDirectory, backupSettings.DiffScriptFile);
 
-                // ایجاد دایرکتوری backup
+               
                 if (!Directory.Exists(backupSettings.BackupDirectory))
                 {
                     Directory.CreateDirectory(backupSettings.BackupDirectory);
                 }
 
-                // 1. بکاپ از پروداکشن
+                
                 logger.LogInformation("Starting production backup...");
                 var prodBackupSuccess = await backupService.BackupDatabaseAsync(prodConnectionString, prodBackupFile);
                 if (!prodBackupSuccess)
@@ -54,7 +54,7 @@ namespace DatabaseBackupService
                     return;
                 }
 
-                // 2. بکاپ از development
+               
                 logger.LogInformation("Starting development backup...");
                 var devBackupSuccess = await backupService.BackupDatabaseAsync(devConnectionString, devBackupFile);
                 if (!devBackupSuccess)
@@ -63,7 +63,7 @@ namespace DatabaseBackupService
                     return;
                 }
 
-                // 3. مقایسه و ساخت diff
+                
                 logger.LogInformation("Comparing backup files...");
                 var hasDiff = await fileService.CompareFilesAndGenerateDiffAsync(prodBackupFile, devBackupFile, diffScriptFile);
 
@@ -71,7 +71,7 @@ namespace DatabaseBackupService
                 {
                     logger.LogInformation("Differences detected! Diff script created.");
 
-                    // 4. اجرای migration روی staging
+                    
                     if (!string.IsNullOrEmpty(stageConnectionString))
                     {
                         logger.LogInformation("Running migration on staging...");
@@ -133,7 +133,7 @@ namespace DatabaseBackupService
                 {
                     logging.ClearProviders();
                     logging.AddConsole();
-                    logging.AddFile("Logs/app-{Date}.txt"); // نیاز به نصب Serilog.Extensions.Logging.File
+                    logging.AddFile("Logs/app-{Date}.txt");
                 });
     }
 }
