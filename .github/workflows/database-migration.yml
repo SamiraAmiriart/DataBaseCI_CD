@@ -25,7 +25,7 @@ jobs:
     
     - name: Check Migration App Exists
       run: |
-        MIGRATION_APP_PATH="/path/to/your/migration-app/YourMigrationApp.dll"
+        MIGRATION_APP_PATH="/path/to/your/migration-app/DBMigrationConsolAPP.dll"
         
         if [ -f "$MIGRATION_APP_PATH" ]; then
           echo " Migration application found at: $MIGRATION_APP_PATH"
